@@ -1,12 +1,12 @@
 # 프로젝트 테스트
 - 레포지토리 복사하기
 ```
-git clone https://github.com/oz-06/MERN-06-BE.git
+git clone 레포지토리 주소
 ```
 
 - 폴더 이동
 ```
-cd MERN-06-BE
+cd 폴더명
 ```
 
 - 포이트리 가상환경 설치

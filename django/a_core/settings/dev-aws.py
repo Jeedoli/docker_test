@@ -2,7 +2,7 @@ from .base import *
 
 DEBUG = True
 
-SERVER_BASE_URL = "http://localhost:8000"
+SERVER_BASE_URL = "http://localhost:3000"
 
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
@@ -15,11 +15,11 @@ CORS_ALLOWED_ORIGINS = [
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("AWS_RDS_NAME"),
-        "USER": os.getenv("AWS_RDS_USER"),
-        "PASSWORD": os.getenv("AWS_RDS_PASSWORD"),
-        "HOST": os.getenv("AWS_RDS_HOST"),
-        "PORT": os.getenv("AWS_RDS_PORT"),
+        "NAME": os.getenv("DEV_AWS_RDS_NAME"),
+        "USER": os.getenv("DEV_AWS_RDS_USER"),
+        "PASSWORD": os.getenv("DEV_AWS_RDS_PASSWORD"),
+        "HOST": os.getenv("DEV_AWS_RDS_HOST"),
+        "PORT": os.getenv("DEV_AWS_RDS_PORT"),
     }
 }
 
@@ -30,12 +30,12 @@ SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 SECURE_PROXY_SSL_HEADER = None  # SSL 프록시 헤더 비활성화
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
@@ -43,4 +43,5 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-FILE_UPLOAD_MAX_MEMORY_SIZE = 3 * 1024 * 1024  # 3MB limit
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB limit
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB limit

@@ -4,27 +4,48 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-if not os.path.exists(".env"):
-    raise FileNotFoundError("Please create a .env file")
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+env_path = os.path.join(BASE_DIR, ".env")
+
+# .env 파일이 없으면 생성
+if not os.path.exists(env_path):
+    with open(".env", "w") as env_file:
+        env_file.write("AWS_RDS_NAME=\n")
+        env_file.write("AWS_RDS_USER=\n")
+        env_file.write("AWS_RDS_PASSWORD=\n")
+        env_file.write("AWS_RDS_HOST=\n")
+        env_file.write("AWS_RDS_PORT=\n")
+        env_file.write("\n")
+        env_file.write("DJANGO_SECRET_KEY= somekey\n")
+        env_file.write("DJANGO_SETTINGS_MODULE=a_core.settings.development\n")
+        env_file.write("\n")
+        env_file.write("AUTH_GOOGLE_CLIENT_ID=\n")
+        env_file.write("AUTH_GOOGLE_CLIENT_SECRET=\n")
+        env_file.write("\n")
+        env_file.write("AUTH_KAKAO_CLIENT_ID=\n")
+        env_file.write("AUTH_KAKAO_CLIENT_SECRET=\n")
+        env_file.write("\n")
+        env_file.write("AUTH_NAVER_CLIENT_ID=\n")
+        env_file.write("AUTH_NAVER_CLIENT_SECRET=\n")
+        env_file.write("\n")
+        env_file.write("SERVER_BASE_URL=https://myapp.com\n")
+        env_file.write("SERVER_BASE_URL_DEV=http://127.0.0.1:3000\n")
 
 # .env 파일 로드
 load_dotenv()
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 AUTH_GOOGLE_CLIENT_ID = os.getenv("AUTH_GOOGLE_CLIENT_ID")
 AUTH_GOOGLE_CLIENT_SECRET = os.getenv("AUTH_GOOGLE_CLIENT_SECRET")
+AUTH_KAKAO_CLIENT_ID = os.getenv("AUTH_KAKAO_CLIENT_ID")
+AUTH_KAKAO_CLIENT_SECRET = os.getenv("AUTH_KAKAO_CLIENT_SECRET")
+AUTH_NAVER_CLIENT_ID = os.getenv("AUTH_NAVER_CLIENT_ID")
+AUTH_NAVER_CLIENT_SECRET = os.getenv("AUTH_NAVER_CLIENT_SECRET")
+
 
 # Application definition
-
 DEFAULT_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -47,7 +68,11 @@ THIRD_PARTY_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
+    "storages",
+    "django_cleanup.apps.CleanupConfig",
+    "channels",
 ]
 
 INSTALLED_APPS = DEFAULT_APPS + CUSTOM_APPS + THIRD_PARTY_APPS
@@ -62,6 +87,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    "a_apis.middleware.ProcessPUTPatchMiddleware",  # PUT, PATCH 요청 처리 미들웨어
 ]
 
 REST_FRAMEWORK = {
@@ -113,19 +139,29 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
-
-TIME_ZONE = "UTC"
-
+LANGUAGE_CODE = "ko-kr"  # 한국어로 변경
+TIME_ZONE = "Asia/Seoul"
 USE_I18N = True
-
-USE_TZ = True
+USE_L10N = True  # 로케일의 형식을 사용
+USE_TZ = False  # False로 설정하여 DB에 UTC 시간대를 사용하지 않음
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+
+# Media files
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+# 디렉토리가 없으면 자동으로 생성
+for directory in [STATIC_ROOT, MEDIA_ROOT] + STATICFILES_DIRS:
+    os.makedirs(directory, exist_ok=True)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -142,7 +178,12 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_USERNAME_REQUIRED = False
 
 # 이메일 설정 (개발환경)
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")  # Gmail 주소
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")  # Gmail 앱 비밀번호
 
 # 사이트 설정
 SITE_ID = 1
@@ -151,9 +192,9 @@ SITE_ID = 1
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-    "ROTATE_REFRESH_TOKENS": False,
+    "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
-    "UPDATE_LAST_LOGIN": False,
+    "UPDATE_LAST_LOGIN": True,
     "ALGORITHM": "HS256",
     "SIGNING_KEY": SECRET_KEY,
     "VERIFYING_KEY": None,
@@ -165,8 +206,11 @@ SIMPLE_JWT = {
     "USER_ID_CLAIM": "user_id",
 }
 
+SERVER_BASE_URL = os.getenv("SERVER_BASE_URL", "")
+SERVER_BASE_URL_DEV = os.getenv("SERVER_BASE_URL_DEV", "")
 
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = os.getenv("LOGIN_REDIRECT_URL", "")
+LOGIN_REDIRECT_URL_DEV = os.getenv("LOGIN_REDIRECT_URL_DEV", "")
 ACCOUNT_LOGOUT_ON_GET = True
 
 # 쿠키 설정
