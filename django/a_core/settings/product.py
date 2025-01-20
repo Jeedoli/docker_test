@@ -11,9 +11,9 @@ ALLOWED_HOSTS = [
     "52.78.37.115",  # EC2 IP
 ]
 CORS_ALLOWED_ORIGINS = [
-    "https://myapp.com", # 프론트 배포 도메인
-    "https://www.myapp.com", # 프론트 배포 도메인
-    "https://api.myapp.com", # 백엔드 배포 도메인
+    "https://myapp.com",  # 프론트 배포 도메인
+    "https://www.myapp.com",  # 프론트 배포 도메인
+    "https://api.myapp.com",  # 백엔드 배포 도메인
     "http://localhost:5173",
     "http://localhost:3000",
     "http://localhost:8000",
@@ -22,9 +22,9 @@ CSRF_TRUSTED_ORIGINS = [
     "https://myapp.com",
     "https://www.myapp.com",
     "https://api.myapp.com",
-    "http://localhost:5173", # Vite dev server
-    "http://localhost:3000", # React / Next.js dev server
-    "http://localhost:8000", # Django dev server
+    "http://localhost:5173",  # Vite dev server
+    "http://localhost:3000",  # React / Next.js dev server
+    "http://localhost:8000",  # Django dev server
 ]
 
 CORS_ALLOW_ALL_ORIGINS = False
@@ -35,8 +35,8 @@ SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SECURE = True  # HTTPS에서만 CSRF 쿠키 전송
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-SESSION_COOKIE_DOMAIN = ".chaeuda.shop"
-CSRF_COOKIE_DOMAIN = ".chaeuda.shop"
+SESSION_COOKIE_DOMAIN = ".myapp.com"  # 도메인 간 쿠키 공유
+CSRF_COOKIE_DOMAIN = ".myapp.com"  # 도메인 간 쿠키 공유
 
 CORS_ALLOW_METHODS = [
     "DELETE",

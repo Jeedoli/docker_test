@@ -1,10 +1,12 @@
+from typing import Any
+
 import requests
 from a_apis.models.email_verification import EmailVerification
 from a_user.models import SocialUser
 from ninja.errors import HttpError
 from rest_framework_simplejwt.tokens import RefreshToken
+
 from django.contrib.auth import get_user_model
-from typing import Any
 
 User = get_user_model()
 

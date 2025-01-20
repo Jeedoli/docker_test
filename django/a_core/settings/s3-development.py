@@ -13,7 +13,7 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 CORS_ALLOWED_ORIGINS = [
     "https://myapp.com",
-    "https://api.myapp.com", 
+    "https://api.myapp.com",
     "http://localhost:5173",
     "http://localhost:3000",
     "http://localhost:8000",
@@ -47,7 +47,7 @@ SHELL_PLUS_IMPORTS = [
 
 # JWT 설정
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=7), # 개발환경에서는 7일로 설정
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=7),  # 개발환경에서는 7일로 설정
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
@@ -105,3 +105,35 @@ SHELL_PLUS_IMPORTS = [
     "from django.conf import settings",
     "from django.core.cache import cache",
 ]
+
+# 템플릿 설정 추가
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [
+            BASE_DIR / "templates",
+        ],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
+]
+
+# CSRF 설정
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
+
+# S3 추가 설정
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = "public-read"
+AWS_S3_OBJECT_PARAMETERS = {
+    "CacheControl": "max-age=86400",
+}
